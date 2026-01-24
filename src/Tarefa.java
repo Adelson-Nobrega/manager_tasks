@@ -1,5 +1,6 @@
 public class Tarefa {
 
-  System.out.print("Testando o comando pull");
-
+  public void executar (){
+    System.out.println("Testando o comando pull");
+  }
 }
