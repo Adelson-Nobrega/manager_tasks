@@ -7,10 +7,36 @@ public class Tarefa {
         private LocalDate dataLimite;
 
 
-        public Tarefa (String titulo, String descricao, LocalDate dataLimite){
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public void setDataLimite(LocalDate dataLimite) {
+        this.dataLimite = dataLimite;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public LocalDate getDataLimite() {
+        return dataLimite;
+    }
+
+    public Tarefa (String titulo, String descricao, LocalDate dataLimite){
             this.titulo = titulo;
             this.descricao = descricao;
             this.dataLimite = dataLimite;
+
+
 
     System.out.println("Testando o comando pull");
 
