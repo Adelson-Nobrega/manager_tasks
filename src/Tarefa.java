@@ -11,7 +11,6 @@ public class Tarefa {
         return titulo;
     }
 
-
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
