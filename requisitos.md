@@ -13,7 +13,7 @@ Além disso, o sistema deve oferecer suporte para **notificações automáticas*
 sob controle. - Extra 
 
 Seu desafio é desenvolver essa solução utilizando **Java**, aplicando conceitos modernos de **programação funcional, manipulação de datas** para tornar 
-o sistema rápido e eficiente.  
+o sistema rápido e eficiente.
 
 ---
 
@@ -34,7 +34,7 @@ A aplicação deve permitir que os usuários realizem as seguintes operações:
 
 ### ✅ Validação e Qualidade dos Dados  
 - Evitar que **tarefas com títulos muito curtos (5 caracteres)** sejam cadastradas.  
-- Garantir que **nenhuma tarefa seja salva sem um status concluído**.  
+- Garantir que **nenhuma tarefa seja cadastrada com o status concluído**.  
 
 ### ✅ Notificações Inteligentes. - Extra.  
 - O sistema deve alertar automaticamente o usuário **quando uma tarefa estiver próxima da data limite**.  
