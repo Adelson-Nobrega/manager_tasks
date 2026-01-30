@@ -6,9 +6,8 @@ public class ManagerMain {
     void main() {
 
         var tarefaService = new TarefaService();
-        MenuPrincipal menu = new MenuPrincipal(tarefaService, tarefaService, tarefaService);
+        var menu = new MenuPrincipal(tarefaService);
 
         menu.run();
-
     }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class Tarefa {
 
+    private int id;
     private String titulo;
     private String descricao;
     private LocalDate dataLimite;
@@ -14,6 +15,14 @@ public class Tarefa {
         this.descricao = descricao;
         this.dataLimite = dataLimite;
         this.status = Status.PENDENTE;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitulo() {
