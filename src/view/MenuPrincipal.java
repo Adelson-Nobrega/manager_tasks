@@ -81,6 +81,9 @@ public class MenuPrincipal {
         } while (!validador.validaData(dataLimite, hoje, FORMATTER));
         var tarefa = new Tarefa(titulo, descricao, LocalDate.parse(dataLimite, FORMATTER));
         tarefaService.cadastrar(tarefa);
+
+        validador.agendarNotificacao(titulo, dataLimite, FORMATTER);
+
     }
 
     private void alteraStatus(Scanner scanner) {
@@ -168,4 +171,5 @@ public class MenuPrincipal {
         System.out.print(alinhaEsquerda(tarefa.getStatus().toString(), 12));
         System.out.println(" |");
     }
+
 }

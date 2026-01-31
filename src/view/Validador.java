@@ -40,7 +40,7 @@ public class Validador {
         LocalDate limite = LocalDate.parse(dataLimite, formatter);
         LocalDate hoje = LocalDate.now();
 
-        long diasRestantes = ChronoUnit.DAYS.between(hoje, limite);
+        long diasRestantes = java.time.temporal.ChronoUnit.DAYS.between(hoje, limite);
 
         if (diasRestantes >= 3) {
             long delay = diasRestantes - 3; // esperar até faltar 3 dias
@@ -53,9 +53,9 @@ public class Validador {
                 }
             });
         } else if (diasRestantes > 0) {
-            System.out.println("A tarefa \"" + titulo + "\"já está próxima da data limite! Faltam apenas" + diasRestantes + "dias.");
+            System.out.println("A tarefa \"" + titulo + "\" já está próxima da data limite! Faltam apenas " + diasRestantes + " dias.");
         } else {
-            System.out.println("A tarefa \"" + titulo + "\"já passou da data limite");
+            System.out.println("A tarefa \"" + titulo + "\" já passou da data limite");
         }
     }
 
