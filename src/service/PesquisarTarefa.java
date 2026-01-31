@@ -4,11 +4,12 @@ import model.Tarefa;
 
 import java.time.Period;
 import java.util.List;
-import java.util.Optional;
 
 public interface PesquisarTarefa {
 
-    Optional<Tarefa> buscaTitulo(String titulo);
+    boolean buscaId(int id);
+
+    List<Tarefa> buscaTitulo(String titulo);
 
     List<Tarefa> listarPorData();
 

@@ -5,12 +5,14 @@ import model.Tarefa;
 import service.TarefaService;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class MenuPrincipal {
 
-    private TarefaService tarefaService;
+    private final Validador validador = new Validador();
+    private final TarefaService tarefaService;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public MenuPrincipal(TarefaService tarefaService) {
@@ -28,7 +30,8 @@ public class MenuPrincipal {
                 System.out.println("3 - Listar por data limite");
                 System.out.println("4 - Buscar tarefas por status");
                 System.out.println("5 - Buscar tarefas por período");
-                System.out.println("6 - Sobre");
+                System.out.println("6 - Buscar tarefas por título");
+                System.out.println("7 - Sobre");
                 System.out.println("0 - Sair");
                 System.out.print("\nDigite uma opção válida: ");
                 option = scanner.nextLine();
@@ -39,12 +42,12 @@ public class MenuPrincipal {
                     case "3" -> exibeListaData();
                     case "4" -> pesquisaStatus(scanner);
                     case "5" -> pesquisaPeriodo(scanner);
-                    case "6" -> sobre();
+                    case "6" -> pesquisaTitulo(scanner);
+                    case "7" -> sobre();
                     default -> System.out.println("Opção inválida!!!");
                 }
             } while (!option.equalsIgnoreCase("0"));
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Falha na inicialização do sistema. Tente novamente!");
         }
     }
@@ -62,14 +65,48 @@ public class MenuPrincipal {
                \s""");
     }
 
-    private void pesquisaPeriodo(Scanner scanner) {
+    private void novaTarefa(Scanner scanner) {
+        String titulo;
+        do {
+            System.out.print("Digite o título da tarefa (maior que 5 caracteres): ");
+            titulo = scanner.nextLine();
+        } while (!validador.validaTitulo(titulo));
+        System.out.print("Digite a descrição da tarefa: ");
+        String descricao = scanner.nextLine();
+        String dataLimite;
+        var hoje = LocalDate.now();
+        do {
+            System.out.print("Digite a data limite da tarefa (dd/MM/yyyy): ");
+            dataLimite = scanner.nextLine();
+        } while (!validador.validaData(dataLimite, hoje, FORMATTER));
+        var tarefa = new Tarefa(titulo, descricao, LocalDate.parse(dataLimite, FORMATTER));
+        tarefaService.cadastrar(tarefa);
+    }
+
+    private void alteraStatus(Scanner scanner) {
+        int id;
+        do {
+            System.out.print("Digite o ID da tarefa: ");
+            id = Integer.parseInt(scanner.nextLine());
+        } while (!tarefaService.buscaId(id));
+        String status;
+        do {
+            System.out.print("Escolha o novo status da tarefa (EM_ANDAMENTO ou CONCLUIDO): ");
+            status = scanner.nextLine().toUpperCase();
+        } while (!validador.validaStatus(status));
+        Status statusEnum = Status.valueOf(status);
+        tarefaService.alterarStatus(id, statusEnum);
+    }
+
+    private void exibeListaData() {
+        formataExibicao();
+        tarefaService.listarPorData().forEach(this::exibeTarefa);
     }
 
     private void pesquisaStatus(Scanner scanner) {
         System.out.print("Digite o status da tarefa (PENDENTE, EM_ANDAMENTO ou CONCLUIDO): ");
-        String status = scanner.nextLine();
-        Status statusEnum = Status.valueOf(status.toUpperCase());
-        var tarefas = tarefaService.buscaStatus(statusEnum.toString());
+        String status = scanner.nextLine().toUpperCase();
+        var tarefas = tarefaService.buscaStatus(status);
         if (tarefas.isEmpty()) {
             formataExibicao();
             return;
@@ -78,18 +115,44 @@ public class MenuPrincipal {
         tarefas.forEach(this::exibeTarefa);
     }
 
-    private String alinhaEsquerda(String value, int size) {
-        return String.format("%-" + size + "s", value);
+    private void pesquisaPeriodo(Scanner scanner) {
+        System.out.print("Digite a quantidade de dias a frente para buscar todas as tarefas não concluidas nesse período: ");
+        int dias = Integer.parseInt(scanner.nextLine());
+        var tarefas = tarefaService.buscaPeriodo(Period.ofDays(dias + 1));
+        if (tarefas.isEmpty()) {
+            formataExibicao();
+            return;
+        }
+        formataExibicao();
+        tarefas.forEach(this::exibeTarefa);
+    }
+
+    private void pesquisaTitulo(Scanner scanner) {
+        System.out.print("Digite o título da tarefa ou parte dele: ");
+        String titulo = scanner.nextLine();
+        var tarefas = tarefaService.buscaTitulo(titulo.toLowerCase());
+        if (tarefas.isEmpty()) {
+            formataExibicao();
+            return;
+        }
+        formataExibicao();
+        tarefas.forEach(this::exibeTarefa);
+    }
+
+    private String alinhaEsquerda(String texto, int size) {
+        return String.format("%-" + size + "s", texto);
     }
 
     private void formataExibicao() {
-        System.out.print(alinhaEsquerda("Id", 3));
+        System.out.print(alinhaEsquerda("\nId", 4));
         System.out.print(" | ");
         System.out.print(alinhaEsquerda("Título", 15));
         System.out.print(" | ");
-        System.out.print(alinhaEsquerda("Descrição", 30));
+        System.out.print(alinhaEsquerda("Descrição", 60));
         System.out.print(" | ");
-        System.out.print(alinhaEsquerda("Data Limite", 10));
+        System.out.print(alinhaEsquerda("Data Limite", 11));
+        System.out.print(" |");
+        System.out.print(alinhaEsquerda("Status", 12));
         System.out.println(" |");
     }
 
@@ -98,46 +161,11 @@ public class MenuPrincipal {
         System.out.print(" | ");
         System.out.print(alinhaEsquerda(tarefa.getTitulo(), 15));
         System.out.print(" | ");
-        System.out.print(alinhaEsquerda(tarefa.getDescricao(), 30));
+        System.out.print(alinhaEsquerda(tarefa.getDescricao(), 60));
         System.out.print(" | ");
-        System.out.print(alinhaEsquerda(tarefa.getDataLimite().format(FORMATTER), 10));
+        System.out.print(alinhaEsquerda(tarefa.getDataLimite().format(FORMATTER), 11));
+        System.out.print(" |");
+        System.out.print(alinhaEsquerda(tarefa.getStatus().toString(), 12));
         System.out.println(" |");
-    }
-
-    private void exibeListaData() {
-        formataExibicao();
-        tarefaService.listarPorData().forEach(this::exibeTarefa);
-    }
-
-    private void alteraStatus(Scanner scanner) {
-        System.out.print("Digite o id da tarefa: ");
-        int id = scanner.nextInt();
-        System.out.print("Escolha o novo status da tarefa (EM_ANDAMENTO ou CONCLUIDO): ");
-        String status = scanner.nextLine();
-        Status statusEnum = Status.valueOf(status.toUpperCase());
-        tarefaService.alterarStatus(id, statusEnum);
-    }
-
-    private void novaTarefa(Scanner scanner) {
-        String titulo;
-        do {
-            System.out.print("Digite o título da tarefa (maior que 5 caracteres): ");
-            titulo = scanner.nextLine();
-        } while (!validaTitulo(titulo));
-        System.out.print("Digite a descrição da tarefa: ");
-        String descricao = scanner.nextLine();
-        System.out.print("Digite a data limite da tarefa (dd/MM/yyyy): ");
-        String dataLimite = scanner.nextLine();
-
-        var tarefa = new Tarefa(titulo, descricao, LocalDate.parse(dataLimite, FORMATTER));
-        tarefaService.cadastrar(tarefa);
-    }
-
-    private boolean validaTitulo(String titulo) {
-        if (titulo.length() < 6) {
-            System.out.println("Títulos muito curtos não são permitidos!");
-            return false;
-        }
-        return true;
     }
 }

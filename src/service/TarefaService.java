@@ -3,10 +3,11 @@ package service;
 import model.Status;
 import model.Tarefa;
 
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 public class TarefaService implements IncluirTarefa, PesquisarTarefa, AlterarTarefa {
 
@@ -28,21 +29,30 @@ public class TarefaService implements IncluirTarefa, PesquisarTarefa, AlterarTar
         tarefas.stream()
                 .filter(t -> t.getId() == id)
                 .findFirst()
-                .get()
-                .setStatus(status);
+                .ifPresent(t -> t.setStatus(status));
     }
 
     @Override
-    public Optional<Tarefa> buscaTitulo(String titulo) {
+    public boolean buscaId(int id) {
+        var localiza = tarefas.stream()
+                              .anyMatch(t -> t.getId() == id);
+        if (!localiza) {
+            System.out.println("ID não encontrado!");
+        }
+        return localiza;
+    }
+
+    @Override
+    public List<Tarefa> buscaTitulo(String titulo) {
         return tarefas.stream()
-                      .filter(t -> t.getTitulo().equalsIgnoreCase(titulo))
-                      .findFirst();
+                      .filter(t -> t.getTitulo().toLowerCase().contains(titulo))
+                      .toList();
     }
 
     @Override
     public List<Tarefa> listarPorData() {
         return tarefas.stream()
-                      .sorted((t1, t2) -> t1.getDataLimite().compareTo(t2.getDataLimite()))
+                      .sorted(Comparator.comparing(Tarefa::getDataLimite))
                       .toList();
     }
 
@@ -55,6 +65,8 @@ public class TarefaService implements IncluirTarefa, PesquisarTarefa, AlterarTar
 
     @Override
     public List<Tarefa> buscaPeriodo(Period periodo) {
-        return tarefas.stream().toList();
+        return tarefas.stream()
+                      .filter(t -> t.getDataLimite().isBefore(LocalDate.now().plus(periodo)))
+                      .toList();
     }
 }
