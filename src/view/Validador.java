@@ -35,13 +35,14 @@ public class Validador {
         }
         return true;
     }
+
     public void agendarNotificacao(String titulo, String dataLimite, DateTimeFormatter formatter) {
         LocalDate limite = LocalDate.parse(dataLimite, formatter);
         LocalDate hoje = LocalDate.now();
 
         long diasRestantes = ChronoUnit.DAYS.between(hoje, limite);
 
-        if(diasRestantes >= 3) {
+        if (diasRestantes >= 3) {
             long delay = diasRestantes - 3; // esperar até faltar 3 dias
             CompletableFuture.runAsync(() -> {
                 try {
@@ -52,11 +53,11 @@ public class Validador {
                 }
             });
         } else if (diasRestantes > 0) {
-                System.out.println("A tarefa \"" + titulo + "\"já está próxima da data limite! Faltam apenas" + diasRestantes + "dias.");
-            } else {
-                System.out.println("A tarefa \"" + titulo + "\"já passou da data limite");
-            }
+            System.out.println("A tarefa \"" + titulo + "\"já está próxima da data limite! Faltam apenas" + diasRestantes + "dias.");
+        } else {
+            System.out.println("A tarefa \"" + titulo + "\"já passou da data limite");
         }
-
     }
+
+}
 
